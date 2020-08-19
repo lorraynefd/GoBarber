@@ -1,6 +1,6 @@
-import Appointment from '../models/Appointments';
 import * as Yup from 'yup';
 import User from '../models/User';
+import Appointment from '../models/Appointment';
 
 class AppointmentController {
     async store (req, res){
@@ -12,22 +12,21 @@ class AppointmentController {
             return res.status(408).json({ error: 'Validação falsa' });
         }
         const { provider_id, date } = req.body;
-        const isProvider = await User.findOne({
+        const checkIsProvider = await User.findOne({
             where: { id: provider_id, provider: true},
         });
-        if (!isProvider){
+        if (!checkIsProvider){
             return res
             .status(401)
-            .json({ error: ' Você só pode criar compromissos com provedores'})
+            .json({ error: ' Você só pode criar compromissos com provedores'});
         }
 
         const appointment = await Appointment.create({
             user_id: req.userId,
             provider_id,
-            date,
+            date
         });
         return res.json(appointment);
     }
 }
-
 export default new AppointmentController();
